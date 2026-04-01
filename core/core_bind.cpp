@@ -75,7 +75,7 @@ Ref<Resource> ResourceLoader::load(const String &p_path, const String &p_type_hi
 	Error err = OK;
 	Ref<Resource> ret = ::ResourceLoader::load(p_path, p_type_hint, ResourceFormatLoader::CacheMode(p_cache_mode), &err);
 
-	ERR_FAIL_COND_V_MSG(err != OK, ret, vformat("Error loading resource: '%s'.", p_path));
+	ERR_FAIL_COND_V_MSG(err != OK, ret, vformat("Error loading resource: '%s' (%d).", p_path, err));
 	return ret;
 }
 

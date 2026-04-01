@@ -310,6 +310,13 @@ Ref<Resource> ResourceFormatLoaderShader::load(const String &p_path, const Strin
 		*r_error = ERR_FILE_CANT_OPEN;
 	}
 
+	print_line(vformat("load shader %s", p_path));
+
+	if (!Engine::get_singleton()->is_editor_hint()) {
+		long sleepTime = 1L + (long)(2 * rand() / (RAND_MAX + 1.0));
+		std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
+	}
+
 	Error error = OK;
 	Vector<uint8_t> buffer = FileAccess::get_file_as_bytes(p_path, &error);
 	ERR_FAIL_COND_V_MSG(error, nullptr, "Cannot load shader: " + p_path);

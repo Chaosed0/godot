@@ -287,6 +287,17 @@ ResourceLoader::LoadToken::~LoadToken() {
 }
 
 Ref<Resource> ResourceLoader::_load(const String &p_path, const String &p_original_path, const String &p_type_hint, ResourceFormatLoader::CacheMode p_cache_mode, Error *r_error, bool p_use_sub_threads, float *r_progress) {
+	static int test = 0;
+	static double wait = 1.0;
+	if (p_path == "res://vfx/decimillipede_suck_shader.tres") {
+		test++;
+		wait = (40.0 * rand() / (RAND_MAX + 1.0));
+		if (!Engine::get_singleton()->is_editor_hint() && test % 2 == 1) {
+			double sleepTime = wait + (wait * rand() / (RAND_MAX + 1.0));
+			std::this_thread::sleep_for(std::chrono::milliseconds((int)sleepTime));
+		}
+	}
+
 	const String &original_path = p_original_path.is_empty() ? p_path : p_original_path;
 	load_nesting++;
 	if (load_paths_stack.size()) {
@@ -598,6 +609,7 @@ Ref<ResourceLoader::LoadToken> ResourceLoader::_load_start(const String &p_path,
 			}
 		}
 
+		print_line(vformat("_load_start %s: instantiate token", p_path));
 		load_token.instantiate();
 		load_token->local_path = local_path;
 		if (p_for_user) {

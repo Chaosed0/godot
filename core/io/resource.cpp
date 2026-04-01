@@ -98,6 +98,8 @@ void Resource::set_path(const String &p_path, bool p_take_over) {
 
 		path_cache = p_path;
 
+		print_line(vformat("set_path %s", p_path));
+
 		if (!path_cache.is_empty()) {
 			ResourceCache::resources[path_cache] = this;
 		}

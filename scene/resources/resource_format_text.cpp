@@ -37,7 +37,7 @@
 #include "scene/property_utils.h"
 
 void ResourceLoaderText::_printerr() {
-	ERR_PRINT(vformat("%s:%d - Parse Error: %s.", res_path, lines, error_text));
+	ERR_PRINT(vformat("%s:%d - Parse Error: %s (%d).", res_path, lines, error_text, error));
 }
 
 Ref<Resource> ResourceLoaderText::get_resource() {
@@ -110,7 +110,13 @@ Error ResourceLoaderText::_parse_sub_resource(VariantParser::Stream *p_stream, R
 	}
 
 	String id = token.value;
-	ERR_FAIL_COND_V(!int_resources.has(id), ERR_INVALID_PARAMETER);
+
+	if (!int_resources.has(id))
+	{
+		r_err_str = vformat("Missing sub_resource %s! Path: %s Line: %s", id, local_path, line);
+		return ERR_INVALID_PARAMETER;
+	}
+
 	r_res = int_resources[id];
 
 	VariantParser::get_token(p_stream, token, line, r_err_str);
@@ -1425,9 +1431,11 @@ Ref<Resource> ResourceFormatLoaderText::load(const String &p_path, const String 
 
 	Error err;
 
+	print_line(vformat("load %s", p_path));
+
 	Ref<FileAccess> f = FileAccess::open(p_path, FileAccess::READ, &err);
 
-	ERR_FAIL_COND_V_MSG(err != OK, Ref<Resource>(), "Cannot open file '" + p_path + "'.");
+	ERR_FAIL_COND_V_MSG(err != OK, Ref<Resource>(), vformat("Cannot open file '%s'. Error: %d", p_path, err));
 
 	ResourceLoaderText loader;
 	String path = !p_original_path.is_empty() ? p_original_path : p_path;
